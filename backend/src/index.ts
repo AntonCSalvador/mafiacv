@@ -63,6 +63,14 @@ io.on("connection", (socket) => {
         assignedRoles[playerId] = role;
       });
 
+      // Loop through each player and send their assigned role directly to them
+      for (const playerId of players) {
+        const role = assignedRoles[playerId];
+
+        // Send the role directly to the player's socket
+        io.to(playerId).emit(role);
+      }
+
       // Emit the assigned roles back to the lobby
       io.to(lobbyId).emit("roles-assigned", assignedRoles);
     },
