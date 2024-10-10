@@ -10,7 +10,7 @@ import '../../index.css'; // Ensure this imports Tailwind styles
 export default function Layout() {
   return (
     <div className="bg-mafiaBlack-default min-h-screen p-4">
-      <Stack align="center">
+      <Stack justify="center" align="center">
         <Group>
           <h1>Hi</h1>
         </Group>
