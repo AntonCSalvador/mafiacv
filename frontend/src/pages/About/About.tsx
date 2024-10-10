@@ -1,9 +1,9 @@
 import "@mantine/core/styles.css";
 import { Button } from "@mantine/core";
 
-const About = () => {
+export default function About(){
   return (
-    <div className="about">
+    <div className="bg-red-800">
       <h1>About Page</h1>
       <p>Learn more about us on this page.</p>
       <Button color="red">
@@ -13,4 +13,3 @@ const About = () => {
   );
 };
 
-export default About;

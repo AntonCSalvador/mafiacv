@@ -6,7 +6,19 @@ module.exports = {
     './node_modules/@mantine/hooks/**/*.js',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        mafiaBlack: {
+          default: "#1D1F27",
+        },
+        mafiaRed: {
+          default: "#E94560",
+        },
+        mafiaGreen: {
+          default: "#3E8E7E",
+        },
+      },
+    },
   },
   plugins: [],
 };
