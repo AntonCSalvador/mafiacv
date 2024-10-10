@@ -6,12 +6,15 @@ import {
   Title,
   List,
   Text,
+  Container,
 } from "@mantine/core";
+import Role from "./RoleSelection";
 import { io } from "socket.io-client";
 import { theme } from "../../theme";
+import RoleSelection from "./RoleSelection";
 
 // Connect to the server
-const socket = io("http://localhost:8000"); // Ensure this matches your server URL
+export const socket = io("http://localhost:8000"); // Ensure this matches your server URL
 
 export default function Home() {
   const [lobbyId, setLobbyId] = useState<string | null>(null);
@@ -19,6 +22,7 @@ export default function Home() {
   const [joinedLobby, setJoinedLobby] = useState(false);
   const [players, setPlayers] = useState<string[]>([]);
   const [inputLobbyId, setInputLobbyId] = useState("");
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     // Log when the socket connects
@@ -27,11 +31,15 @@ export default function Home() {
     });
 
     // Handle lobby creation
-    socket.on("lobby-created", (data: { lobbyId: string }) => {
-      setLobbyId(data.lobbyId);
-      setIsHost(true);
-      console.log("Lobby created with ID:", data.lobbyId);
-    });
+    socket.on(
+      "lobby-created",
+      (data: { lobbyId: string; playerId: string }) => {
+        setLobbyId(data.lobbyId);
+        setIsHost(true);
+        console.log("Lobby created with ID:", data.lobbyId);
+        setPlayers((prev) => [...prev, data.playerId]);
+      },
+    );
 
     // Handle player joining
     socket.on("player-joined", (data: { playerId: string }) => {
@@ -51,6 +59,11 @@ export default function Home() {
         prevPlayers.filter((playerId) => playerId !== disconnectedId),
       );
       console.log(`Player with ID ${disconnectedId} has disconnected.`);
+    });
+
+    socket.on("roles-assigned", (role) => {
+      console.log("Role assigned:", role);
+      setRole(role);
     });
 
     // Clean up the effect when the component unmounts
@@ -107,6 +120,7 @@ export default function Home() {
                   <List.Item key={playerId}>{playerId}</List.Item>
                 ))}
               </List>
+              <RoleSelection playerIDs={players} />
             </div>
           ) : (
             <div>
