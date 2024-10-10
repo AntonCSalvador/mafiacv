@@ -9,6 +9,10 @@ import {
 } from "@mantine/core";
 import { io } from "socket.io-client";
 import { theme } from "./theme";
+import './index.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home/Home';
+import About from './pages/About/About';
 
 // Connect to the server
 const socket = io("http://localhost:8000"); // Ensure this matches your server URL
@@ -75,6 +79,12 @@ export default function App() {
 
   return (
     <MantineProvider theme={theme}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+        </Routes>
+      </Router>
       <div style={{ padding: "20px" }}>
         <Title order={2}>
           {lobbyId ? `Lobby ID: ${lobbyId}` : "Welcome to the Game!"}
