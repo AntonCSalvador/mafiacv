@@ -25,6 +25,7 @@ io.on("connection", (socket) => {
   // Listen for players joining a lobby
   socket.on("join-lobby", (lobbyId) => {
     socket.join(lobbyId);
+    socket.data.lobbyId = lobbyId; // Store the lobby ID in the socket object
     socket.to(lobbyId).emit("player-joined", { playerId: socket.id }); // Notify other players
   });
 
@@ -63,6 +64,14 @@ io.on("connection", (socket) => {
         assignedRoles[playerId] = role;
       });
 
+      // Loop through each player and send their assigned role directly to them
+      for (const playerId of players) {
+        const role = assignedRoles[playerId];
+
+        // Send the role directly to the player's socket
+        io.to(playerId).emit(role);
+      }
+
       // Emit the assigned roles back to the lobby
       io.to(lobbyId).emit("roles-assigned", assignedRoles);
     },
@@ -71,6 +80,7 @@ io.on("connection", (socket) => {
   // Handle user disconnect
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
+    io.to(socket.data.lobbyId).emit("user-disconnected", socket.id);
   });
 });
 
