@@ -45,12 +45,21 @@ export default function Home() {
       // Logic to transition to the game screen can be added here
     });
 
+    // Handle user disconnect
+    socket.on("user-disconnected", (disconnectedId) => {
+      setPlayers((prevPlayers) =>
+        prevPlayers.filter((playerId) => playerId !== disconnectedId),
+      );
+      console.log(`Player with ID ${disconnectedId} has disconnected.`);
+    });
+
     // Clean up the effect when the component unmounts
     return () => {
       socket.off("connect");
       socket.off("lobby-created");
       socket.off("player-joined");
       socket.off("game-started");
+      socket.off("user-disconnected");
     };
   }, []);
 
@@ -92,9 +101,7 @@ export default function Home() {
                   Start Game
                 </Button>
               )}
-              <Text size="lg">
-                Players:
-              </Text>
+              <Text size="lg">Players:</Text>
               <List>
                 {players.map((playerId) => (
                   <List.Item key={playerId}>{playerId}</List.Item>
