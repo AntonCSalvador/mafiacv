@@ -92,7 +92,7 @@ export default function Home() {
                   Start Game
                 </Button>
               )}
-              <Text size="lg" weight={500}>
+              <Text size="lg">
                 Players:
               </Text>
               <List>
