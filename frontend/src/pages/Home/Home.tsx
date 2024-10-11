@@ -100,6 +100,11 @@ export default function Home() {
     }
   };
 
+  const generateStory = () => {
+    socket.emit("generate-story", 'reirere', ['ryder', 'wilson', 'lazzy'], 'lazzy', 'ryder', 'the beach');
+    console.log("story created!");
+  }
+
   return (
     <MantineProvider theme={theme}>
       <div className="home">
@@ -168,6 +173,14 @@ export default function Home() {
                   Waiting for the host to start the game...
                 </Text>
               )}
+
+              <Button
+                onClick={() => {generateStory();}}
+                color="green"
+                style={{marginLeft: "20px"}}
+              >
+                Generate Story
+              </Button>
             </div>
           )}
         </div>

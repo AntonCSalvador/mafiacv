@@ -1,6 +1,7 @@
 import express from "express";
 import http from "http";
 import { Server, Socket } from "socket.io";
+import { getStory } from "./text-gen"; // Import your getStory function
 import cors from "cors"; // Make sure to install this package if you haven't already
 
 const app = express();
@@ -16,17 +17,16 @@ io.on("connection", (socket) => {
   console.log("New user connected:", socket.id);
 
   // Listen for creating a lobby
-  socket.on("create-lobby", (name) => {
+  socket.on("create-lobby", () => {
     const lobbyId = Math.random().toString(36).substring(2, 8); // Generate a random lobby ID
     socket.join(lobbyId);
-    socket.emit("lobby-created", { lobbyId, playerId: socket.id, name });
+    socket.emit("lobby-created", { lobbyId }); // Notify the host with the lobby ID
   });
 
   // Listen for players joining a lobby
-  socket.on("join-lobby", (lobbyId, name) => {
+  socket.on("join-lobby", (lobbyId) => {
     socket.join(lobbyId);
-    socket.data.lobbyId = lobbyId; // Store the lobby ID in the socket object
-    socket.to(lobbyId).emit("player-joined", { playerId: socket.id, name }); // Notify other players
+    socket.to(lobbyId).emit("player-joined", { playerId: socket.id }); // Notify other players
   });
 
   // Listen for starting the game
@@ -46,34 +46,52 @@ io.on("connection", (socket) => {
     [key: string]: string; // Key is the player's socket ID, value is their role
   }
 
-  socket.on("select-roles", (roles: string[], players: string[]) => {
-    // Shuffle the roles array to ensure randomness
-    roles = shuffleArray(roles);
+  socket.on(
+    "select-roles",
+    (lobbyId: string, roles: string[], players: string[]) => {
+      socket.join(lobbyId);
 
-    // Create an object to store the assigned roles
-    const assignedRoles: AssignedRoles = {};
+      // Shuffle the roles array to ensure randomness
+      roles = shuffleArray(roles);
 
-    // Assign the shuffled roles to players
-    players.forEach((playerId, index) => {
-      // Assign a role from the shuffled list if available, otherwise "Town"
-      const role = index < roles.length ? roles[index] : "Town";
-      assignedRoles[playerId] = role;
-    });
+      // Create an object to store the assigned roles
+      const assignedRoles: AssignedRoles = {};
 
-    console.log("Assigned roles:", assignedRoles);
-    // Loop through each player and send their assigned role directly to them
-    for (const playerId of players) {
-      const role = assignedRoles[playerId];
+      // Assign the shuffled roles to players
+      players.forEach((playerId, index) => {
+        // Assign a role from the shuffled list if available, otherwise "Town"
+        const role = index < roles.length ? roles[index] : "Town";
+        assignedRoles[playerId] = role;
+      });
 
-      // Send the role directly to the player's socket
-      io.to(playerId).emit("roles-assigned", role);
-    }
-  });
+      // Emit the assigned roles back to the lobby
+      io.to(lobbyId).emit("roles-assigned", assignedRoles);
+    },
+  );
 
   // Handle user disconnect
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
-    io.to(socket.data.lobbyId).emit("user-disconnected", socket.id);
+  });
+
+  // Handle end of night story creation
+  socket.on("generate-story", async (lobbyId: string, players: string[], killed: string, saved: string, setting: string) => {
+    let prompt = "";
+  
+    if (killed === saved) {
+      prompt = `Write a story about a group of people. The setting is ${setting}. The players' names are ${players}. During the night, in our story, ${killed} was almost killed by 'the mafia'. Write the story relative to our setting. Make it interesting and funny. Keep it under 50 words. Involve at least 3 characters in the story. Use misdirection as to not reveal who almost died until the end of the story. It should be clear that the medic saved the person and that nobody died. Keep it under 50 words.`;
+    } else {
+      prompt = `Write a story about a murder. The setting of this murder is ${setting}. The players' names are ${players}. During the night, in our story, ${killed} was killed by 'the mafia'. Write the story of the mafia killing this person relative to our setting. Make it interesting and funny. Keep it under 50 words. Involve at least 3 characters in the story. Use misdirection as to not reveal who died until the end of the story. It should be clear who died in the story. Keep it under 50 words.`;
+    }
+  
+    try {
+      const storyResponse = await getStory(prompt);
+      console.log(storyResponse);
+      io.to(lobbyId).emit("story-generated", storyResponse); // Emit the story to the lobby
+    } catch (error) {
+      console.error("Error generating story:", error);
+      io.to(lobbyId).emit("story-error", { error: "Failed to generate the story." });
+    }
   });
 });
 
