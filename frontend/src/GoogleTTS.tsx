@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const GoogleTTS: React.FC = () => {
-  const [text, setText] = useState<string>('');
+interface GoogleTTSProps {
+  placeholderText?: string; // Prop to accept placeholder text
+}
+
+const GoogleTTS: React.FC<GoogleTTSProps> = ({ placeholderText }) => {
+  const [text, setText] = useState(placeholderText); // Set the initial text to an empty string
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
-  const API_KEY = 'AIzaSyA6VTNzK8e1tYB6HvJxpxGsI070dOO25Bg'; // Replace with your actual API key
+  const API_KEY = 'AIzaSyAkZwGZ3u_39ITut0FJaz4Zivbj-FYxmEY'; // Replace with your actual API key
 
   const handleSpeak = async () => {
+    setText(placeholderText);
+
     if (!text) {
       alert("Please enter some text.");
       return;
@@ -48,23 +55,28 @@ const GoogleTTS: React.FC = () => {
           alert('An error occurred while synthesizing speech.');
         }
       }
-      
+
   };
 
+  // Update text when the user inputs or automatically when component mounts
+  useEffect(() => {
+      if (placeholderText) {
+          setText(placeholderText);
+        }
+    }, [placeholderText]);
+    
+    useEffect(() => {
+      if (text) {
+        handleSpeak();
+      }
+    }, [text]);
+
   return (
-    <div>
-      <h2>Google Text-to-Speech</h2>
-      <textarea
-        rows={4}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Type something to convert to speech"
-      />
+    <div>      
       <br />
-      <button onClick={handleSpeak}>Generate Speech</button>
       {audioUrl && (
         <div>
-          <h3>Generated Speech:</h3>
+
           <audio controls src={audioUrl} />
         </div>
       )}

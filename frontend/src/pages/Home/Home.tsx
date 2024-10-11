@@ -12,6 +12,8 @@ import { io } from "socket.io-client";
 import { theme } from "../../theme";
 import RoleSelection from "./RoleSelection";
 import { createPlayer, Player } from "../../models/player";
+import GoogleTTS from "../../GoogleTTS";
+
 
 // Connect to the server
 export const socket = io("http://localhost:8000"); // Ensure this matches your server URL
@@ -24,6 +26,7 @@ export default function Home() {
   const [inputLobbyId, setInputLobbyId] = useState("");
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
+  const [story, setStory] = useState("");
 
   useEffect(() => {
     // Log when the socket connects
@@ -61,6 +64,12 @@ export default function Home() {
       );
       console.log(`Player with ID ${disconnectedId} has disconnected.`);
     });
+
+    // save story
+    socket.on("story-generated", (story) => {
+      console.log(story);
+      setStory(story);
+    })
 
     socket.on("roles-assigned", (role) => {
       console.log("Role assigned:", role);
@@ -181,6 +190,8 @@ export default function Home() {
               >
                 Generate Story
               </Button>
+
+              <GoogleTTS placeholderText={story} />
             </div>
           )}
         </div>
