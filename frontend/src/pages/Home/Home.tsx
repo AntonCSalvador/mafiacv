@@ -105,7 +105,7 @@ export default function Home() {
                   >
                     Start Game
                   </Button>
-                  <RoleSelection players={players} />
+                  <RoleSelection lobbyId={lobbyId} />
                 </>
               ) : (
                 <Text size="lg">Waiting for host to start the game...</Text>
@@ -116,6 +116,7 @@ export default function Home() {
                   <List.Item key={player.socketID}>{player.name}</List.Item>
                 ))}
               </List>
+              <Title>{role}</Title>
             </div>
           ) : (
             <div>

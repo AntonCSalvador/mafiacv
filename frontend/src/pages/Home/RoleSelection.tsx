@@ -1,21 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button, Group, Text } from "@mantine/core";
 import { socket } from "./Home";
-import { Player } from "../../models/player";
 
 interface RoleSelectionProps {
-  players: Player[];
+  lobbyId: string;
 }
 
-const RoleSelection: React.FC<RoleSelectionProps> = ({ players }) => {
+const RoleSelection: React.FC<RoleSelectionProps> = ({ lobbyId }) => {
   const [mafiaCount, setMafiaCount] = useState<number>(0);
   const [medicCount, setMedicCount] = useState<number>(0);
-
-  useEffect(() => {
-    socket.on("roles-assigned", (data) => {
-      console.log("Role selection data:", data);
-    });
-  });
 
   const handleIncrement = (
     setter: React.Dispatch<React.SetStateAction<number>>,
@@ -38,11 +31,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ players }) => {
   };
 
   const selectRoles = (roles: string[]) => {
-    socket.emit(
-      "select-roles",
-      roles,
-      players.map((player) => player.socketID),
-    );
+    socket.emit("select-roles", roles, lobbyId);
   };
 
   return (

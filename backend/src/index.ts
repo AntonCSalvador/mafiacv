@@ -38,7 +38,9 @@ io.on("connection", (socket) => {
 
     socket.emit("lobby-created", {
       lobbyId,
-      players: lobbies.get(lobbyId)!.players,
+      players: lobbies
+        .get(lobbyId)!
+        .players.map(({ name, isAlive }) => ({ name, isAlive })),
     });
   });
 
@@ -59,7 +61,12 @@ io.on("connection", (socket) => {
     });
 
     // Notify all players in the lobby to update the players list
-    io.to(lobbyId).emit("players-updated", lobbies.get(lobbyId)!.players);
+    io.to(lobbyId).emit(
+      "players-updated",
+      lobbies
+        .get(lobbyId)!
+        .players.map(({ name, isAlive }) => ({ name, isAlive })),
+    );
   });
 
   // Listen for starting the game
@@ -75,31 +82,23 @@ io.on("connection", (socket) => {
     return array;
   };
 
-  interface AssignedRoles {
-    [key: string]: string; // Key is the player's socket ID, value is their role
-  }
-
-  socket.on("select-roles", (roles: string[], players: string[]) => {
-    // Shuffle the roles array to ensure randomness
+  socket.on("select-roles", (roles: string[], lobbyId: string) => {
     roles = shuffleArray(roles);
 
-    // Create an object to store the assigned roles
-    const assignedRoles: AssignedRoles = {};
+    if (!lobbies.has(lobbyId)) {
+      socket.emit("lobby-not-found");
+      return;
+    }
 
-    // Assign the shuffled roles to players
-    players.forEach((playerId, index) => {
+    const players = lobbies.get(lobbyId)!.players;
+    players.forEach((player, index) => {
       // Assign a role from the shuffled list if available, otherwise "Town"
       const role = index < roles.length ? roles[index] : "Town";
-      assignedRoles[playerId] = role;
+      player.role = role;
     });
 
-    console.log("Assigned roles:", assignedRoles);
-    // Loop through each player and send their assigned role directly to them
-    for (const playerId of players) {
-      const role = assignedRoles[playerId];
-
-      // Send the role directly to the player's socket
-      io.to(playerId).emit("roles-assigned", role);
+    for (const player of players) {
+      io.to(player.socketID).emit("roles-assigned", player.role);
     }
   });
 
