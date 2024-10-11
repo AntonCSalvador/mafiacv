@@ -12,6 +12,8 @@ import { io } from "socket.io-client";
 import { theme } from "../../theme";
 import RoleSelection from "./RoleSelection";
 import { createPlayer, Player } from "../../models/player";
+import GoogleTTS from "../../GoogleTTS";
+
 
 // Connect to the server
 export const socket = io("http://localhost:8000"); // Ensure this matches your server URL
@@ -19,14 +21,13 @@ export const socket = io("http://localhost:8000"); // Ensure this matches your s
 export default function Home() {
   const [lobbyId, setLobbyId] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
-  const [joinedLobby, setJoinedLobby] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
   const [inputLobbyId, setInputLobbyId] = useState("");
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
+  const [story, setStory] = useState("");
 
   useEffect(() => {
-    // Log when the socket connects
     socket.on("connect", () => {
       console.log("Connected to server:", socket.id);
     });
@@ -34,18 +35,15 @@ export default function Home() {
     // Handle lobby creation
     socket.on(
       "lobby-created",
-      (data: { lobbyId: string; playerId: string; name: string }) => {
+      (data: { lobbyId: string; players: Player[] }) => {
         setLobbyId(data.lobbyId);
         setIsHost(true);
-        setPlayers((prev) => [...prev, createPlayer(data.playerId, data.name)]);
+        setPlayers(data.players);
       },
     );
 
-    // Handle player joining
-    socket.on("player-joined", (data: { playerId: string; name: string }) => {
-      setPlayers((prev) => [...prev, createPlayer(data.playerId, data.name)]);
-      console.log("Player joined:", data.playerId, data.name);
-      console.log("Players:", players);
+    socket.on("players-updated", (players: Player[]) => {
+      setPlayers(players);
     });
 
     // Handle game start event
@@ -62,6 +60,12 @@ export default function Home() {
       console.log(`Player with ID ${disconnectedId} has disconnected.`);
     });
 
+    // save story
+    socket.on("story-generated", (story) => {
+      console.log(story);
+      setStory(story);
+    })
+
     socket.on("roles-assigned", (role) => {
       console.log("Role assigned:", role);
       setRole(role);
@@ -71,9 +75,8 @@ export default function Home() {
     return () => {
       socket.off("connect");
       socket.off("lobby-created");
-      socket.off("player-joined");
+      socket.off("players-updated");
       socket.off("game-started");
-      socket.off("user-disconnected");
     };
   }, []);
 
@@ -88,7 +91,7 @@ export default function Home() {
   const joinLobby = () => {
     if (inputLobbyId) {
       socket.emit("join-lobby", inputLobbyId, name);
-      setJoinedLobby(true);
+      setLobbyId(inputLobbyId);
       console.log("Joining lobby:", inputLobbyId);
     }
   };
@@ -100,6 +103,11 @@ export default function Home() {
     }
   };
 
+  const generateStory = () => {
+    socket.emit("generate-story", 'reirere', ['ryder', 'wilson', 'lazzy'], 'lazzy', 'ryder', 'the beach');
+    console.log("story created!");
+  }
+
   return (
     <MantineProvider theme={theme}>
       <div className="home">
@@ -110,14 +118,19 @@ export default function Home() {
 
           {lobbyId ? (
             <div>
-              {isHost && (
-                <Button
-                  onClick={startGame}
-                  color="blue"
-                  style={{ marginBottom: "20px" }}
-                >
-                  Start Game
-                </Button>
+              {isHost ? (
+                <>
+                  <Button
+                    onClick={startGame}
+                    color="blue"
+                    style={{ marginBottom: "20px" }}
+                  >
+                    Start Game
+                  </Button>
+                  <RoleSelection lobbyId={lobbyId} />
+                </>
+              ) : (
+                <Text size="lg">Waiting for host to start the game...</Text>
               )}
               <Text size="lg">Players:</Text>
               <List>
@@ -125,7 +138,7 @@ export default function Home() {
                   <List.Item key={player.socketID}>{player.name}</List.Item>
                 ))}
               </List>
-              <RoleSelection players={players} />
+              <Title>{role}</Title>
             </div>
           ) : (
             <div>
@@ -163,11 +176,22 @@ export default function Home() {
               >
                 Join Game
               </Button>
+
               {joinedLobby && (
                 <Text color="blue">
                   Waiting for the host to start the game...
                 </Text>
               )}
+
+              <Button
+                onClick={() => {generateStory();}}
+                color="green"
+                style={{marginLeft: "20px"}}
+              >
+                Generate Story
+              </Button>
+
+              <GoogleTTS placeholderText={story} />
             </div>
           )}
         </div>

@@ -8,6 +8,8 @@ import Ryder from "./pages/RyderModal/Home";
 import Michelle from "./pages/MHome/Home";
 import Lobby from "./pages/Lobby/About";
 import Night from "./pages/Night/Night";
+import Kitchen from "./pages/Kitchen/About";
+import Day from "./pages/DayText/About";
 
 export default function App() {
   return (
@@ -20,6 +22,8 @@ export default function App() {
           <Route path="/Michelle" element={<Michelle />} />
           <Route path="/Lobby" element={<Lobby />} />
           <Route path="/Night" element={<Night />} />
+          <Route path="/Kitchen" element={<Kitchen />} />
+          <Route path="/Day" element={<Day />} />
         </Routes>
       </Router>
     </MantineProvider>
