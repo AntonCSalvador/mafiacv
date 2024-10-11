@@ -4,10 +4,12 @@ import {
   Group,
   Stack,
   Text,
-  CopyButton
+  CopyButton,
+  ScrollArea
 } from "@mantine/core";
 import { IconSettings } from '@tabler/icons-react';
 import '../../index.css';
+import LobbyPlayer from '../../components/lobbyPlayer'
 
 export default function Layout() {
   return (
@@ -26,7 +28,7 @@ export default function Layout() {
               Theme
           </Button>
         </Group>
-        <Group className="border border-mafiaRed-default rounded-lg p-4">
+        <Group className="border-4 border-mafiaRed-default rounded-lg p-4">
           <Stack>
             <Group>
               <Text size="md" color="white">Everyone's Ready</Text>
@@ -37,16 +39,23 @@ export default function Layout() {
                 <IconSettings size={24} stroke={2} />
               </Button>
             </Group>
+            <Group justify="center" align="center">
+              <div className="min-w-[100%] w-[100%] bg-mafiaBlack-default p-4">
+                <ScrollArea h={400}>
+                  <LobbyPlayer name="Beabadoobee"/>
+                  <LobbyPlayer name="Gojo"/>
+                  <LobbyPlayer name="Clairo"/>
+                  <LobbyPlayer name="Lasagna Field"/>
+                  <LobbyPlayer name="Hanni Pham"/>
+                  <LobbyPlayer name="COTTONVELVET"/>
+                  <LobbyPlayer name="Kaniel"/>
+                  <LobbyPlayer name="Joey"/>
+                </ScrollArea>
+              </div>
+            </Group>
           </Stack>
         </Group>        
       </Stack>
-
-
-      <h1 className="text-white">About Page</h1>
-      <p className="text-white">Learn more about us on this page.</p>
-      <Button color="red">
-        go
-      </Button>
     </div>
   );
 }
