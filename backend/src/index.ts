@@ -16,16 +16,17 @@ io.on("connection", (socket) => {
   console.log("New user connected:", socket.id);
 
   // Listen for creating a lobby
-  socket.on("create-lobby", () => {
+  socket.on("create-lobby", (name) => {
     const lobbyId = Math.random().toString(36).substring(2, 8); // Generate a random lobby ID
     socket.join(lobbyId);
-    socket.emit("lobby-created", { lobbyId }); // Notify the host with the lobby ID
+    socket.emit("lobby-created", { lobbyId, playerId: socket.id, name });
   });
 
   // Listen for players joining a lobby
-  socket.on("join-lobby", (lobbyId) => {
+  socket.on("join-lobby", (lobbyId, name) => {
     socket.join(lobbyId);
-    socket.to(lobbyId).emit("player-joined", { playerId: socket.id }); // Notify other players
+    socket.data.lobbyId = lobbyId; // Store the lobby ID in the socket object
+    socket.to(lobbyId).emit("player-joined", { playerId: socket.id, name }); // Notify other players
   });
 
   // Listen for starting the game
@@ -45,32 +46,34 @@ io.on("connection", (socket) => {
     [key: string]: string; // Key is the player's socket ID, value is their role
   }
 
-  socket.on(
-    "select-roles",
-    (lobbyId: string, roles: string[], players: string[]) => {
-      socket.join(lobbyId);
+  socket.on("select-roles", (roles: string[], players: string[]) => {
+    // Shuffle the roles array to ensure randomness
+    roles = shuffleArray(roles);
 
-      // Shuffle the roles array to ensure randomness
-      roles = shuffleArray(roles);
+    // Create an object to store the assigned roles
+    const assignedRoles: AssignedRoles = {};
 
-      // Create an object to store the assigned roles
-      const assignedRoles: AssignedRoles = {};
+    // Assign the shuffled roles to players
+    players.forEach((playerId, index) => {
+      // Assign a role from the shuffled list if available, otherwise "Town"
+      const role = index < roles.length ? roles[index] : "Town";
+      assignedRoles[playerId] = role;
+    });
 
-      // Assign the shuffled roles to players
-      players.forEach((playerId, index) => {
-        // Assign a role from the shuffled list if available, otherwise "Town"
-        const role = index < roles.length ? roles[index] : "Town";
-        assignedRoles[playerId] = role;
-      });
+    console.log("Assigned roles:", assignedRoles);
+    // Loop through each player and send their assigned role directly to them
+    for (const playerId of players) {
+      const role = assignedRoles[playerId];
 
-      // Emit the assigned roles back to the lobby
-      io.to(lobbyId).emit("roles-assigned", assignedRoles);
-    },
-  );
+      // Send the role directly to the player's socket
+      io.to(playerId).emit("roles-assigned", role);
+    }
+  });
 
   // Handle user disconnect
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
+    io.to(socket.data.lobbyId).emit("user-disconnected", socket.id);
   });
 });
 
