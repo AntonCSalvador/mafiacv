@@ -22,9 +22,11 @@ export default function HomePage(){
       <img src="/images/cotton_velvet.jpg"  className="w-12 h-12 border-transparent hover:border-white border-2" />
       <Group>
       <h1 className= "underline text-slate-100 hover:text-red-600">home</h1>
-      <img src="/images/github_logo.webp" className= "w-12 h-12 border-transparent hover:border-white border-2"  />
+      <img src="/images/github_logo.webp"
+      className= "w-12 h-12 border-transparent hover:border-white border-2" 
+      onClick={() => {window.open('https://github.com/AntonCSalvador/mafiacv', '_blank'); console.log("test");}} />
       </Group>
-        
+  
       </Group>
     <div style={{ height: '75vh', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
     <Stack mt="lg" justify="center" align="center">
