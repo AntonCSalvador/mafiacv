@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -55,7 +54,6 @@ const GoogleTTS: React.FC<GoogleTTSProps> = ({ placeholderText }) => {
           alert('An error occurred while synthesizing speech.');
         }
       }
-
   };
 
   // Update text when the user inputs or automatically when component mounts
@@ -76,7 +74,6 @@ const GoogleTTS: React.FC<GoogleTTSProps> = ({ placeholderText }) => {
       <br />
       {audioUrl && (
         <div>
-
           <audio controls src={audioUrl} />
         </div>
       )}
