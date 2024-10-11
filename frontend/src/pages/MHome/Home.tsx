@@ -1,21 +1,7 @@
 import "@mantine/core/styles.css";
-import { Button, Stack } from "@mantine/core";
-import { useState } from 'react';
-import { Container, Group, Burger } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import {Text} from '@mantine/core';
-import { Box } from '@mantine/core';
+import { Button } from "@mantine/core";
 
-
-const tabs = [
-  'home',
-  'cotton_velvet',
-];
-
-export default function HomePage(){
-  const [opened, { toggle }] = useDisclosure(false);
-  const [active, setActive] = useState(false);
-
+export default function About(){
   return (
     <div style={{ backgroundColor: 'black', minHeight: '100vh' }}>
       <Group justify="space-between" style={{ marginBottom: '40px' }}>

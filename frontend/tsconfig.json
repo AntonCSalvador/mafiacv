@@ -19,6 +19,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "../backend/src/text-gen.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
