@@ -11,6 +11,8 @@ import {
   Stack,
   Text,
   CopyButton,
+  AspectRatio,
+  rem,
   ScrollArea
 } from "@mantine/core";
 import { IconSettings } from '@tabler/icons-react';
@@ -28,22 +30,42 @@ export default function Night() {
   
     
     return (
-      <div style={{ backgroundColor: 'black'}}>
-      <Box maw="50vw" mx="25vw" c="blue.6" bg="#fff">
-        <BackgroundImage
-          src="/images/campfire.gif" 
-          radius="sm"
-      >
-          <Center p="25vh" my="15vh">
-            <Stack align="center">
-              <Text>Page loaded <b>{seconds}</b> seconds ago</Text>
-              <Button onClick={interval.toggle} color={interval.active ? 'red' : 'teal'}>
-                {interval.active ? 'Stop' : 'Start'} counting
-              </Button>
-            </Stack>
-          </Center>
-        </BackgroundImage>
-      </Box>
+      <div className="bg-mafiaBlack-default min-h-screen p-4 flex items-center justify-center">
+        <Box maw="90vw" mx="auto" >
+          {/* Red border Box */}
+          <Box
+            style={{
+              border: '4px solid red', 
+              borderRadius: '0.5rem', 
+              overflow: 'hidden', 
+            }}
+          >
+            
+            <BackgroundImage
+              src="/images/campfire.gif"
+              radius="sm"
+              style={{
+                height: '50vh', 
+                width: '50vw', 
+                maxHeight: 'none', 
+                backgroundPosition: 'center', // Center the image
+              }}
+            >
+              <Center style={{ height: '100%' }} p="md">
+                <Stack align="center">
+                  <Text size="lg" color="#fff">
+                    Page loaded <b>{seconds}</b> seconds ago
+                  </Text>
+                  <Button onClick={interval.toggle} color={interval.active ? 'red' : 'teal'}>
+                    {interval.active ? 'Stop' : 'Start'} counting
+                  </Button>
+                </Stack>
+              </Center>
+            </BackgroundImage>
+            
+          </Box>
+        </Box>
       </div>
     );
+    
   }
