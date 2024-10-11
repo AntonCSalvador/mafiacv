@@ -84,14 +84,8 @@ io.on("connection", (socket) => {
       prompt = `Write a story about a murder. The setting of this murder is ${setting}. The players' names are ${players}. During the night, in our story, ${killed} was killed by 'the mafia'. Write the story of the mafia killing this person relative to our setting. Make it interesting and funny. Keep it under 50 words. Involve at least 3 characters in the story. Use misdirection as to not reveal who died until the end of the story. It should be clear who died in the story. Keep it under 50 words.`;
     }
   
-    try {
-      const storyResponse = await getStory(prompt);
-      console.log(storyResponse);
-      io.to(lobbyId).emit("story-generated", storyResponse); // Emit the story to the lobby
-    } catch (error) {
-      console.error("Error generating story:", error);
-      io.to(lobbyId).emit("story-error", { error: "Failed to generate the story." });
-    }
+    const storyResponse = await getStory(prompt);
+    socket.emit("story-generated", storyResponse);
   });
 });
 
