@@ -14,7 +14,21 @@ import LobbyPlayer from '../../components/lobbyPlayer'
 export default function Layout() {
   return (
     <div className="bg-mafiaBlack-default min-h-screen p-4">
-      <Stack justify="center" align="center">
+      {/* Header */}
+      <Group justify="space-between" style={{ marginBottom: '40px' }}>
+        <img src="/images/cotton_velvet.jpg"  className="w-12 h-12 border-transparent hover:border-white border-2" />
+        <Group>
+          <h1 className= "underline text-slate-100 hover:text-red-600">home</h1>
+          <img src="/images/github_logo.webp"
+          className= "w-12 h-12 border-transparent hover:border-white border-2" 
+          onClick={() => {window.open('https://github.com/AntonCSalvador/mafiacv', '_blank'); console.log("test");}} />
+        </Group>
+      </Group>
+      {/* End header */}
+      <Stack mt="xs" justify="center" align="center">
+        <Group>
+          <Text size="md" color="red">Location: Beabadoobee Concert</Text>
+        </Group>
         <Group>
           <Text size="md" color="red">Invite Code: </Text>
           <CopyButton value="https://www.youtube.com/">
@@ -41,7 +55,7 @@ export default function Layout() {
             </Group>
             <Group justify="center" align="center">
               <div className="min-w-[100%] w-[100%] bg-mafiaBlack-default p-4">
-                <ScrollArea h={400}>
+                <ScrollArea h={300}>
                   <LobbyPlayer name="Beabadoobee"/>
                   <LobbyPlayer name="Gojo"/>
                   <LobbyPlayer name="Clairo"/>
