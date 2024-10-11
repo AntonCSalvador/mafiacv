@@ -7,6 +7,7 @@ import About from "./pages/About/About";
 import Ryder from "./pages/RyderModal/Home";
 import Michelle from "./pages/MHome/Home";
 import Lobby from "./pages/Lobby/About";
+import Kitchen from "./pages/Kitchen/About";
 
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/Ryder" element={<Ryder />} />
           <Route path="/Michelle" element={<Michelle />} />
           <Route path="/Lobby" element={<Lobby />} />
+          <Route path="/Kitchen" element={<Kitchen />} />
         </Routes>
       </Router>
     </MantineProvider>
