@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Google Generative AI with your API key
 const apiKey = process.env.VITE_GEMINI_API_KEY || 'null'; // Ensure you have your API key available in environment variables
-const genAI = new GoogleGenerativeAI(`AIzaSyD3hPMRAZVyrRE3bis7n5TWNxdSzw8OU_g`);
+const genAI = new GoogleGenerativeAI(apiKey);
 
 // Get the generative model from Google
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
