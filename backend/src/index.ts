@@ -19,7 +19,10 @@ interface Player {
   role: string;
 }
 
-const lobbies = new Map<string, { hostId: string; players: Player[] }>();
+const lobbies = new Map<
+  string,
+  { hostId: string; players: Player[]; nominations: Set<string> }
+>();
 
 io.on("connection", (socket) => {
   console.log("New user connected:", socket.id);
@@ -34,6 +37,7 @@ io.on("connection", (socket) => {
     lobbies.set(lobbyId, {
       hostId: socket.id,
       players: [{ socketID: socket.id, name: name, isAlive: true, role: "" }],
+      nominations: new Set<string>(),
     });
 
     socket.emit("lobby-created", {
@@ -102,6 +106,24 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("nominate", (lobbyId: string, playerName: string) => {
+    if (!lobbies.has(lobbyId)) {
+      socket.emit("lobby-not-found");
+      return;
+    }
+
+    const lobby = lobbies.get(lobbyId);
+
+    // 2 nominations are needed to start the voting phase
+    if (lobby!.nominations.has(playerName)) {
+      lobby!.nominations.clear();
+      io.to(lobbyId).emit("defense", playerName);
+      return;
+    }
+
+    lobby!.nominations.add(playerName);
+  });
+
   // Handle user disconnect
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
@@ -113,6 +135,11 @@ io.on("connection", (socket) => {
       lobby.players = lobby.players.filter(
         (player) => player.socketID !== socket.id,
       );
+
+      if (lobby.players.length === 0) {
+        lobbies.delete(lobbyId);
+        return;
+      }
 
       lobbies.set(lobbyId, lobby);
 

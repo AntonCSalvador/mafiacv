@@ -6,12 +6,11 @@ import {
   Title,
   List,
   Text,
-  Container,
 } from "@mantine/core";
 import { io } from "socket.io-client";
 import { theme } from "../../theme";
 import RoleSelection from "./RoleSelection";
-import { createPlayer, Player } from "../../models/player";
+import { Player } from "../../models/player";
 
 // Connect to the server
 export const socket = io("http://localhost:8000"); // Ensure this matches your server URL
@@ -23,6 +22,8 @@ export default function Home() {
   const [inputLobbyId, setInputLobbyId] = useState("");
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
+  const [defendant, setDefendant] = useState("");
+  const [nomination, setNomination] = useState("");
 
   useEffect(() => {
     socket.on("connect", () => {
@@ -54,12 +55,17 @@ export default function Home() {
       setRole(role);
     });
 
+    socket.on("defense", (playerName) => {
+      setDefendant(playerName);
+    });
+
     // Clean up the effect when the component unmounts
     return () => {
       socket.off("connect");
       socket.off("lobby-created");
       socket.off("players-updated");
       socket.off("game-started");
+      socket.off("roles-assigned");
     };
   }, []);
 
@@ -84,6 +90,11 @@ export default function Home() {
       socket.emit("start-game", lobbyId);
       console.log("Game started in lobby:", lobbyId);
     }
+  };
+
+  const nominatePlayer = (playerName: string) => {
+    setNomination(playerName);
+    socket.emit("nominate", lobbyId, playerName);
   };
 
   return (
@@ -117,6 +128,19 @@ export default function Home() {
                 ))}
               </List>
               <Title>{role}</Title>
+              <Button
+                onClick={() => {
+                  nominatePlayer("Lazzi");
+                }}
+                color="red"
+                disabled={nomination !== ""}
+              >
+                Lazzi
+              </Button>
+
+              {defendant && (
+                <Title>{defendant} has 30 seconds to defend themselves.</Title>
+              )}
             </div>
           ) : (
             <div>
