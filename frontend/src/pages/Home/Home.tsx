@@ -19,14 +19,12 @@ export const socket = io("http://localhost:8000"); // Ensure this matches your s
 export default function Home() {
   const [lobbyId, setLobbyId] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
-  const [joinedLobby, setJoinedLobby] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
   const [inputLobbyId, setInputLobbyId] = useState("");
   const [role, setRole] = useState("");
   const [name, setName] = useState("");
 
   useEffect(() => {
-    // Log when the socket connects
     socket.on("connect", () => {
       console.log("Connected to server:", socket.id);
     });
@@ -34,32 +32,21 @@ export default function Home() {
     // Handle lobby creation
     socket.on(
       "lobby-created",
-      (data: { lobbyId: string; playerId: string; name: string }) => {
+      (data: { lobbyId: string; players: Player[] }) => {
         setLobbyId(data.lobbyId);
         setIsHost(true);
-        setPlayers((prev) => [...prev, createPlayer(data.playerId, data.name)]);
+        setPlayers(data.players);
       },
     );
 
-    // Handle player joining
-    socket.on("player-joined", (data: { playerId: string; name: string }) => {
-      setPlayers((prev) => [...prev, createPlayer(data.playerId, data.name)]);
-      console.log("Player joined:", data.playerId, data.name);
-      console.log("Players:", players);
+    socket.on("players-updated", (players: Player[]) => {
+      setPlayers(players);
     });
 
     // Handle game start event
     socket.on("game-started", () => {
       alert("The game has started!");
       // Logic to transition to the game screen can be added here
-    });
-
-    // Handle user disconnect
-    socket.on("user-disconnected", (disconnectedId) => {
-      setPlayers((prevPlayers) =>
-        prevPlayers.filter((playerId) => playerId !== disconnectedId),
-      );
-      console.log(`Player with ID ${disconnectedId} has disconnected.`);
     });
 
     socket.on("roles-assigned", (role) => {
@@ -71,9 +58,8 @@ export default function Home() {
     return () => {
       socket.off("connect");
       socket.off("lobby-created");
-      socket.off("player-joined");
+      socket.off("players-updated");
       socket.off("game-started");
-      socket.off("user-disconnected");
     };
   }, []);
 
@@ -88,7 +74,7 @@ export default function Home() {
   const joinLobby = () => {
     if (inputLobbyId) {
       socket.emit("join-lobby", inputLobbyId, name);
-      setJoinedLobby(true);
+      setLobbyId(inputLobbyId);
       console.log("Joining lobby:", inputLobbyId);
     }
   };
@@ -110,14 +96,19 @@ export default function Home() {
 
           {lobbyId ? (
             <div>
-              {isHost && (
-                <Button
-                  onClick={startGame}
-                  color="blue"
-                  style={{ marginBottom: "20px" }}
-                >
-                  Start Game
-                </Button>
+              {isHost ? (
+                <>
+                  <Button
+                    onClick={startGame}
+                    color="blue"
+                    style={{ marginBottom: "20px" }}
+                  >
+                    Start Game
+                  </Button>
+                  <RoleSelection lobbyId={lobbyId} />
+                </>
+              ) : (
+                <Text size="lg">Waiting for host to start the game...</Text>
               )}
               <Text size="lg">Players:</Text>
               <List>
@@ -125,7 +116,7 @@ export default function Home() {
                   <List.Item key={player.socketID}>{player.name}</List.Item>
                 ))}
               </List>
-              <RoleSelection players={players} />
+              <Title>{role}</Title>
             </div>
           ) : (
             <div>
@@ -163,11 +154,6 @@ export default function Home() {
               >
                 Join Game
               </Button>
-              {joinedLobby && (
-                <Text color="blue">
-                  Waiting for the host to start the game...
-                </Text>
-              )}
             </div>
           )}
         </div>
