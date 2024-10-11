@@ -36,26 +36,26 @@ export default function Layout() {
             <Text size="lg" c="white" mt="xs">Theme: L'Checkers</Text>
             <Image radius="md" mb="xs" mr="xs" ml="xs" src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png" className="border-4 border-mafiaRed-default" />
           </Stack>
-          <GoogleTTS placeholderText={story} />
+          <Group>
+            <GoogleTTS placeholderText={story} />
+            <Button
+              onClick={() => {generateStory();}}
+              color="green"
+              style={{marginLeft: "20px"}}
+            >
+              Generate Story
+            </Button>
+          </Group>
         </Stack>
         <Stack mt="sm" className="w-full md:w-1/3 border-4 border-mafiaRed-default rounded-md">
           <Group justify="center" align="center">
               <div className="min-w-[100%] w-[100%] bg-mafiaBlack-default p-4">
-                <Text size="xl" c="white">{story}</Text>
+                <ScrollArea h={400}>
+                  <Text size="xl" c="white">{story}</Text>
+                </ScrollArea>
               </div>
           </Group>       
         </Stack>
-      </Group>
-
-      {/* to remove later */}
-      <Group>
-        <Button
-          onClick={() => {generateStory();}}
-          color="green"
-          style={{marginLeft: "20px"}}
-        >
-          Generate Story
-        </Button>
       </Group>
     </div>
   );
