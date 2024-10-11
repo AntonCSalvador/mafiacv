@@ -1,9 +1,28 @@
 import "@mantine/core/styles.css";
-import { Group, Stack, Text, Image, ScrollArea } from "@mantine/core";
+import { Group, Stack, Text, Image, ScrollArea, Button } from "@mantine/core";
+import { useState } from "react";
+import { io } from "socket.io-client";
 import '../../index.css';
-import VotePlayer from '../../components/votePlayer';
+import GoogleTTS from "../../GoogleTTS";
+
+
+export const socket = io("http://localhost:8000"); // Ensure this matches your server URL
 
 export default function Layout() {
+  const [story, setStory] = useState("");
+
+  // save story
+  socket.on("story-generated", (story) => {
+    console.log(story);
+    setStory(story);
+  });
+
+  // generate story via socket listener
+  const generateStory = () => {
+    socket.emit("generate-story", 'reirere', ['ryder', 'wilson', 'lazzy'], 'lazzy', 'ryder', 'the beach');
+    console.log("story created!");
+  }
+
   return (
 
     <div className="bg-mafiaBlack-default min-h-screen items-center">
@@ -15,20 +34,21 @@ export default function Layout() {
         <Stack mt="sm" className="w-full md:w-1/3 border-4 border-mafiaRed-default rounded-md">
           <Group justify="center" align="center">
               <div className="min-w-[100%] w-[100%] bg-mafiaBlack-default p-4">
-                <Text mb="sm" size="md" color="white">Nominations: </Text>
-                <ScrollArea h={400}>
-                  <VotePlayer name="Beabadoobee"/>
-                  <VotePlayer name="Gojo"/>
-                  <VotePlayer name="Clairo"/>
-                  <VotePlayer name="Lasagna Field"/>
-                  <VotePlayer name="Hanni Pham"/>
-                  <VotePlayer name="COTTONVELVET"/>
-                  <VotePlayer name="Kaniel"/>
-                  <VotePlayer name="Joey"/>
-                </ScrollArea>
+                <GoogleTTS placeholderText={story} />
               </div>
           </Group>       
         </Stack>
+      </Group>
+
+      {/* to remove later */}
+      <Group>
+        <Button
+          onClick={() => {generateStory();}}
+          color="green"
+          style={{marginLeft: "20px"}}
+        >
+          Generate Story
+        </Button>
       </Group>
     </div>
   );
