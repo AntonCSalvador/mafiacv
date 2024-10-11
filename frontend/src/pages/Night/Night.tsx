@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react';
 import { useInterval } from '@mantine/hooks';
 import "@mantine/core/styles.css";
 import { 
+  BackgroundImage,
+  Center, 
+  Box,
   Button,
   Group,
   Stack,
@@ -23,12 +26,24 @@ export default function Night() {
       return interval.stop;
     }, []);
   
+    
     return (
-      <Stack align="center">
-        <Text>Page loaded <b>{seconds}</b> seconds ago</Text>
-        <Button onClick={interval.toggle} color={interval.active ? 'red' : 'teal'}>
-          {interval.active ? 'Stop' : 'Start'} counting
-        </Button>
-      </Stack>
+      <div style={{ backgroundColor: 'black'}}>
+      <Box maw="50vw" mx="25vw" c="blue.6" bg="#fff">
+        <BackgroundImage
+          src="/images/campfire.gif" 
+          radius="sm"
+      >
+          <Center p="25vh" my="15vh">
+            <Stack align="center">
+              <Text>Page loaded <b>{seconds}</b> seconds ago</Text>
+              <Button onClick={interval.toggle} color={interval.active ? 'red' : 'teal'}>
+                {interval.active ? 'Stop' : 'Start'} counting
+              </Button>
+            </Stack>
+          </Center>
+        </BackgroundImage>
+      </Box>
+      </div>
     );
   }
