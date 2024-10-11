@@ -16,17 +16,17 @@ io.on("connection", (socket) => {
   console.log("New user connected:", socket.id);
 
   // Listen for creating a lobby
-  socket.on("create-lobby", () => {
+  socket.on("create-lobby", (name) => {
     const lobbyId = Math.random().toString(36).substring(2, 8); // Generate a random lobby ID
     socket.join(lobbyId);
-    socket.emit("lobby-created", { lobbyId, playerId: socket.id });
+    socket.emit("lobby-created", { lobbyId, playerId: socket.id, name });
   });
 
   // Listen for players joining a lobby
-  socket.on("join-lobby", (lobbyId) => {
+  socket.on("join-lobby", (lobbyId, name) => {
     socket.join(lobbyId);
     socket.data.lobbyId = lobbyId; // Store the lobby ID in the socket object
-    socket.to(lobbyId).emit("player-joined", { playerId: socket.id }); // Notify other players
+    socket.to(lobbyId).emit("player-joined", { playerId: socket.id, name }); // Notify other players
   });
 
   // Listen for starting the game
