@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Group, Text } from "@mantine/core";
 import { socket } from "./Home";
+import { Player } from "../../models/player";
 
 interface RoleSelectionProps {
   lobbyId: string;
