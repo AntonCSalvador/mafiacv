@@ -7,20 +7,16 @@ import About from "./pages/About/About";
 import Ryder from "./pages/RyderModal/Home";
 import Michelle from "./pages/MHome/Home";
 import Lobby from "./pages/Lobby/About";
+import React from 'react';
+import GoogleTTS from './GoogleTTS';
 
-
-export default function App() {
+const App: React.FC = () => {
   return (
-    <MantineProvider theme={theme}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/Ryder" element={<Ryder />} />
-          <Route path="/Michelle" element={<Michelle />} />
-          <Route path="/Lobby" element={<Lobby />} />
-        </Routes>
-      </Router>
-    </MantineProvider>
+    <div>
+      <h1>Text to Speech App</h1>
+      <GoogleTTS />
+    </div>
   );
-}
+};
+
+export default App;
