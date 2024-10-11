@@ -86,6 +86,22 @@ io.on("connection", (socket) => {
     return array;
   };
 
+  const mafiaWin = (players: Player[]): boolean => {
+    let mafiaCount = 0;
+    let townCount = 0;
+  
+    players.forEach((player: Player) => {
+      if (player.role === "mafia" && player.isAlive) {
+        mafiaCount++;
+      }
+      else if (player.isAlive) {
+        townCount++;
+      }
+    });
+
+    return (mafiaCount / townCount) >= 0.5;
+  };
+  
   socket.on("select-roles", (roles: string[], lobbyId: string) => {
     roles = shuffleArray(roles);
 
