@@ -12,21 +12,54 @@ const io = new Server(server, {
   },
 });
 
+interface Player {
+  socketID: string;
+  name: string;
+  isAlive: boolean;
+  role: string;
+}
+
+const lobbies = new Map<string, { hostId: string; players: Player[] }>();
+
 io.on("connection", (socket) => {
   console.log("New user connected:", socket.id);
 
   // Listen for creating a lobby
   socket.on("create-lobby", (name) => {
     const lobbyId = Math.random().toString(36).substring(2, 8); // Generate a random lobby ID
+
     socket.join(lobbyId);
-    socket.emit("lobby-created", { lobbyId, playerId: socket.id, name });
+    socket.data.lobbyId = lobbyId;
+
+    lobbies.set(lobbyId, {
+      hostId: socket.id,
+      players: [{ socketID: socket.id, name: name, isAlive: true, role: "" }],
+    });
+
+    socket.emit("lobby-created", {
+      lobbyId,
+      players: lobbies.get(lobbyId)!.players,
+    });
   });
 
-  // Listen for players joining a lobby
-  socket.on("join-lobby", (lobbyId, name) => {
+  socket.on("join-lobby", (lobbyId: string, name: string) => {
+    if (!lobbies.has(lobbyId)) {
+      socket.emit("lobby-not-found");
+      return;
+    }
+
     socket.join(lobbyId);
-    socket.data.lobbyId = lobbyId; // Store the lobby ID in the socket object
-    socket.to(lobbyId).emit("player-joined", { playerId: socket.id, name }); // Notify other players
+    socket.data.lobbyId = lobbyId;
+
+    lobbies.get(lobbyId)!.players.push({
+      socketID: socket.id,
+      name: name,
+      isAlive: true,
+      role: "",
+    });
+
+    // Notify all players in the lobby to update the players list
+    io.to(lobbyId).emit("players-updated", lobbies.get(lobbyId)!.players);
   });
 
   // Listen for starting the game
@@ -73,7 +106,20 @@ io.on("connection", (socket) => {
   // Handle user disconnect
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
-    io.to(socket.data.lobbyId).emit("user-disconnected", socket.id);
+    const lobbyId = socket.data.lobbyId;
+    const lobby = lobbies.get(lobbyId);
+
+    // If socket is in game lobby, remove them
+    if (lobby) {
+      lobby.players = lobby.players.filter(
+        (player) => player.socketID !== socket.id,
+      );
+
+      lobbies.set(lobbyId, lobby);
+
+      console.log("Players in lobby:", lobby.players);
+      io.to(lobbyId).emit("players-updated", lobby.players);
+    }
   });
 });
 
