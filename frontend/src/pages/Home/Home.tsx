@@ -14,7 +14,6 @@ import RoleSelection from "./RoleSelection";
 import { createPlayer, Player } from "../../models/player";
 import GoogleTTS from "../../GoogleTTS";
 
-
 // Connect to the server
 export const socket = io("http://localhost:8000"); // Ensure this matches your server URL
 
@@ -39,7 +38,7 @@ export default function Home() {
         setLobbyId(data.lobbyId);
         setIsHost(true);
         setPlayers(data.players);
-      },
+      }
     );
 
     socket.on("players-updated", (players: Player[]) => {
@@ -55,16 +54,16 @@ export default function Home() {
     // Handle user disconnect
     socket.on("user-disconnected", (disconnectedId) => {
       setPlayers((prevPlayers) =>
-        prevPlayers.filter((playerId) => playerId !== disconnectedId),
+        prevPlayers.filter((playerId) => playerId !== disconnectedId)
       );
       console.log(`Player with ID ${disconnectedId} has disconnected.`);
     });
 
-    // save story
-    socket.on("story-generated", (story) => {
-      console.log(story);
-      setStory(story);
-    })
+    // save story 
+    // socket.on("story-generated", (story) => {
+    //   console.log(story);
+    //   setStory(story);
+    // });
 
     socket.on("roles-assigned", (role) => {
       console.log("Role assigned:", role);
@@ -104,9 +103,16 @@ export default function Home() {
   };
 
   const generateStory = () => {
-    socket.emit("generate-story", 'reirere', ['ryder', 'wilson', 'lazzy'], 'lazzy', 'ryder', 'the beach');
+    socket.emit(
+      "generate-story",
+      "reirere",
+      ["ryder", "wilson", "lazzy"],
+      "lazzy",
+      "ryder",
+      "the beach"
+    );
     console.log("story created!");
-  }
+  };
 
   return (
     <MantineProvider theme={theme}>
@@ -184,9 +190,11 @@ export default function Home() {
               )}
 
               <Button
-                onClick={() => {generateStory();}}
+                onClick={() => {
+                  generateStory();
+                }}
                 color="green"
-                style={{marginLeft: "20px"}}
+                style={{ marginLeft: "20px" }}
               >
                 Generate Story
               </Button>
