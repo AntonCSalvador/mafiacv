@@ -1,5 +1,5 @@
 import "@mantine/core/styles.css";
-import { Button } from "@mantine/core";
+import { Group, Text, Stack } from "@mantine/core";
 
 export default function About(){
   return (
@@ -24,4 +24,3 @@ export default function About(){
     </div>
   );
 };
-
