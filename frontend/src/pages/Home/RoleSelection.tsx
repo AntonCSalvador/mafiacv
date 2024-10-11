@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button, Group, Text } from "@mantine/core";
 import { socket } from "./Home";
+import { Player } from "../../models/player";
 
 interface RoleSelectionProps {
-  playerIDs: string[];
+  players: Player[];
 }
 
-const RoleSelection: React.FC<RoleSelectionProps> = ({ playerIDs }) => {
+const RoleSelection: React.FC<RoleSelectionProps> = ({ players }) => {
   const [mafiaCount, setMafiaCount] = useState<number>(0);
   const [medicCount, setMedicCount] = useState<number>(0);
 
@@ -37,8 +38,11 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ playerIDs }) => {
   };
 
   const selectRoles = (roles: string[]) => {
-    console.log(playerIDs, roles);
-    socket.emit("select-roles", roles, playerIDs);
+    socket.emit(
+      "select-roles",
+      roles,
+      players.map((player) => player.socketID),
+    );
   };
 
   return (
