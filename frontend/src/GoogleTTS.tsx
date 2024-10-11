@@ -9,7 +9,7 @@ const GoogleTTS: React.FC<GoogleTTSProps> = ({ placeholderText }) => {
   const [text, setText] = useState(placeholderText); // Set the initial text to an empty string
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
-  const API_KEY = 'AIzaSyAkZwGZ3u_39ITut0FJaz4Zivbj-FYxmEY'; // Replace with your actual API key
+  const API_KEY = process.env.API_KEY;
 
   const handleSpeak = async () => {
     setText(placeholderText);
