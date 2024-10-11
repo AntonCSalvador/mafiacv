@@ -120,6 +120,20 @@ io.on("connection", (socket) => {
       console.log("Players in lobby:", lobby.players);
       io.to(lobbyId).emit("players-updated", lobby.players);
     }
+
+    // Handle end of night story creation
+    socket.on("generate-story", async (lobbyId: string, players: string[], killed: string, saved: string, setting: string) => {
+      let prompt = "";
+    
+      if (killed === saved) {
+        prompt = `Write a story about a group of people. The setting is ${setting}. The players' names are ${players}. During the night, in our story, ${killed} was almost killed by 'the mafia'. Write the story relative to our setting. Make it interesting and funny. Keep it under 50 words. Involve at least 3 characters in the story. Use misdirection as to not reveal who almost died until the end of the story. It should be clear that the medic saved the person and that nobody died. Keep it under 50 words.`;
+      } else {
+        prompt = `Write a story about a murder. The setting of this murder is ${setting}. The players' names are ${players}. During the night, in our story, ${killed} was killed by 'the mafia'. Write the story of the mafia killing this person relative to our setting. Make it interesting and funny. Keep it under 50 words. Involve at least 3 characters in the story. Use misdirection as to not reveal who died until the end of the story. It should be clear who died in the story. Keep it under 50 words.`;
+      }
+    
+      const storyResponse = await getStory(prompt);
+      socket.emit("story-generated", storyResponse);
+    });
   });
 });
 
