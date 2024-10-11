@@ -4,16 +4,16 @@ import { Stack, Group, Text, Box, ScrollArea } from "@mantine/core";
 export default function RulePage(){
   return (
     <div style={{ backgroundColor: '#1D1F27', minHeight: '100vh' }}>
-      <Group justify="space-between" style={{ marginBottom: '40px' }}>
-      <img src="/images/cotton_velvet.jpg"  className="w-12 h-12 border-transparent hover:border-white border-2" />
-      <Group>
-      <a href= '/' className= "underline text-slate-100 hover:text-red-600">home</a>
-      <img src="/images/github_logo.webp"
-      className= "w-12 h-12 border-transparent hover:border-white border-2" 
-      onClick={() => {window.open('https://github.com/AntonCSalvador/mafiacv', '_blank'); console.log("test");}} />
+      <Group className="p-4 pb-0" justify="space-between" style={{ marginBottom: '40px' }}>
+        <img src="/images/cotton_velvet.jpg"  className="w-12 h-12 border-transparent hover:border-white border-2" />
+        <Group>
+          <h1 className= "underline text-slate-100 hover:text-red-600">home</h1>
+          <img src="/images/github_logo.webp"
+          className= "w-12 h-12 border-transparent hover:border-white border-2" 
+          onClick={() => {window.open('https://github.com/AntonCSalvador/mafiacv', '_blank'); console.log("test");}} />
+        </Group>
       </Group>
-      </Group>
-    <div style={{ height: '75vh', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+    <div style={{ height: '70vh', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
       <Stack mt="lg" justify="center" align="center">
       <Text size="xl" fw={700} style={{ color: '#E94560',fontSize: '36px' }}>How to Play</Text> 
       <Box className= "bg-mafiaBlack-default border-4 border-mafiaRed-default rounded-md p-4 h-[80vh] w-[95vw]" >
