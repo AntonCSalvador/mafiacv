@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Group, Text } from "@mantine/core";
-import { socket } from "./Home";
+import { socket } from "./Pages";
 import { Player } from "../../models/player";
 
 interface RoleSelectionProps {
@@ -12,13 +12,13 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ lobbyId }) => {
   const [medicCount, setMedicCount] = useState<number>(0);
 
   const handleIncrement = (
-    setter: React.Dispatch<React.SetStateAction<number>>,
+    setter: React.Dispatch<React.SetStateAction<number>>
   ) => {
     setter((prev) => prev + 1);
   };
 
   const handleDecrement = (
-    setter: React.Dispatch<React.SetStateAction<number>>,
+    setter: React.Dispatch<React.SetStateAction<number>>
   ) => {
     setter((prev) => Math.max(prev - 1, 0));
   };
