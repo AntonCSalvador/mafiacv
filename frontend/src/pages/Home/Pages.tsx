@@ -59,7 +59,7 @@ export default function Home() {
       console.log(`Player with ID ${disconnectedId} has disconnected.`);
     });
 
-    // save story 
+    // save story
     // socket.on("story-generated", (story) => {
     //   console.log(story);
     //   setStory(story);
@@ -183,11 +183,11 @@ export default function Home() {
                 Join Game
               </Button>
 
-              {joinedLobby && (
+              {/* {joinedLobby && (
                 <Text color="blue">
                   Waiting for the host to start the game...
                 </Text>
-              )}
+              )} */}
 
               <Button
                 onClick={() => {
