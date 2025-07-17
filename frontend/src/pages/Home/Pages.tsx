@@ -14,44 +14,19 @@ import { createPlayer, Player } from "../../models/player";
 import GoogleTTS from "../../GoogleTTS";
 import { socket } from '../../utils/socket'
 
-export default function Home() {
-	const [lobbyId, setLobbyId] = useState<string | null>(null);
-	const [isHost, setIsHost] = useState(false);
-	const [players, setPlayers] = useState<Player[]>([]);
-	const [inputLobbyId, setInputLobbyId] = useState("");
+export default function Home(props) {
 	const [role, setRole] = useState("");
-	const [name, setName] = useState("");
 	const [story, setStory] = useState("");
 
 	useEffect(() => {
 	
-		// Handle lobby creation
-		socket.on(
-			"lobby-created",
-			(data: { lobbyId: string; players: Player[] }) => {
-				setLobbyId(data.lobbyId);
-				setIsHost(true);
-				setPlayers(data.players);
-			}
-		);
+		// // Handle game start event
+		// socket.on("game-started", () => {
+		// 	alert("The game has started!");
+		// 	// Logic to transition to the game screen can be added here
+		// });
 
-		socket.on("players-updated", (players: Player[]) => {
-			setPlayers(players);
-		});
-
-		// Handle game start event
-		socket.on("game-started", () => {
-			alert("The game has started!");
-			// Logic to transition to the game screen can be added here
-		});
-
-		// Handle user disconnect
-		socket.on("user-disconnected", (disconnectedId) => {
-			setPlayers((prevPlayers) =>
-				prevPlayers.filter((playerId) => playerId !== disconnectedId)
-			);
-			console.log(`Player with ID ${disconnectedId} has disconnected.`);
-		});
+		
 
 		// save story
 		// socket.on("story-generated", (story) => {
@@ -66,7 +41,7 @@ export default function Home() {
 
 		// Clean up the effect when the component unmounts
 		return () => {
-			socket.off("connect");
+			// socket.off("connect");
 			socket.off("lobby-created");
 			socket.off("players-updated");
 			socket.off("game-started");
@@ -74,26 +49,26 @@ export default function Home() {
 	}, []);
 
 	const createLobby = () => {
-    console.log("Name", name)
-		if (name) {
-			socket.emit("create-lobby", name);
+    console.log("Name", props.name)
+		if (props.name) {
+			socket.emit("lobby:create", props.name);
 		} else {
 			console.log("Name is required to create a lobby");
 		}
 	};
 
 	const joinLobby = () => {
-		if (inputLobbyId) {
-			socket.emit("join-lobby", inputLobbyId, name);
-			setLobbyId(inputLobbyId);
-			console.log("Joining lobby:", inputLobbyId);
+		if (props.inputLobbyId) {
+			socket.emit("lobby:join", props.inputLobbyId, props.name);
+			props.setLobbyId(props.inputLobbyId);
+			console.log("Joining lobby:", props.inputLobbyId);
 		}
 	};
 
 	const startGame = () => {
-		if (lobbyId) {
-			socket.emit("start-game", lobbyId);
-			console.log("Game started in lobby:", lobbyId);
+		if (props.lobbyId) {
+			socket.emit("start-game", props.lobbyId);
+			console.log("Game started in lobby:", props.lobbyId);
 		}
 	};
 
@@ -109,17 +84,19 @@ export default function Home() {
 		console.log("story created!");
 	};
 
+  const players = props.players
+
 	return (
 		<MantineProvider theme={theme}>
 			<div className="home">
 				<div style={{ padding: "20px" }}>
 					<Title order={2}>
-						{lobbyId ? `Lobby ID: ${lobbyId}` : "Welcome to the Game!"}
+						{props.lobbyId ? `Lobby ID: ${props.lobbyId}` : "Welcome to the Game!"}
 					</Title>
 
-					{lobbyId ? (
+					{props.lobbyId ? (
 						<div>
-							{isHost ? (
+							{props.isHost ? (
 								<>
 									<Button
 										onClick={startGame}
@@ -128,14 +105,14 @@ export default function Home() {
 									>
 										Start Game
 									</Button>
-									<RoleSelection lobbyId={lobbyId} />
+									<RoleSelection lobbyId={props.lobbyId} />
 								</>
 							) : (
 								<Text size="lg">Waiting for host to start the game...</Text>
 							)}
 							<Text size="lg">Players:</Text>
 							<List>
-								{players.map((player) => (
+								{players.map((player: Player) => (
 									<List.Item key={player.socketID}>{player.name}</List.Item>
 								))}
 							</List>
@@ -152,22 +129,22 @@ export default function Home() {
 							</Button>
 							<TextInput
 								placeholder="Enter Lobby ID"
-								value={inputLobbyId}
-								onChange={(e) => setInputLobbyId(e.currentTarget.value)}
+								value={props.inputLobbyId}
+								onChange={(e) => props.setInputLobbyId(e.currentTarget.value)}
 								style={{ marginBottom: "20px" }}
 							/>
 							<TextInput
 								label="Name"
 								placeholder="Enter your name"
-								value={name}
+								value={props.name}
 								onChange={(event) => {
-									setName(event.currentTarget.value);
+									props.setName(event.currentTarget.value);
 								}}
 							/>
 
 							<Button
 								onClick={() => {
-									if (name && inputLobbyId) {
+									if (props.name && props.inputLobbyId) {
 										joinLobby();
 									} else {
 										console.log("Name and join code are required");
