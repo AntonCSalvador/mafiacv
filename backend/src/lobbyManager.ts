@@ -1,41 +1,56 @@
 import { error } from "console";
-import { Lobby, Player, LobbyStore } from "./types"
+import { Lobby, Player, ILobbyStore, ILobbyManager } from "./types";
+import { LobbyStore } from "./lobbyStore";
 
-function getLobby(lobbyStore: LobbyStore, id: string) {
-    return lobbyStore.lobbies.get(id)
-}
+export class LobbyManager implements ILobbyManager {
+  private lobbyStore: ILobbyStore;
 
-function createLobby(lobbyStore: LobbyStore, host: Player) {
+  constructor(lobbyStore: ILobbyStore) {
+    this.lobbyStore = lobbyStore;
+  }
+
+  createLobby(host: Player): Lobby {
     // TODO: Check if lobby exists
     const newId = Math.random().toString(36).substring(2, 8);
 
-    if (getLobby(lobbyStore, newId)) {
-        throw error("Lobby already exists")
-    }
-
     const newLobby: Lobby = {
-        id: newId,
-        host: host,
-        players: [],
+      id: newId,
+      host: host,
+      players: [host],
+    };
+
+    this.lobbyStore.addLobby(newLobby);
+    return newLobby;
+  }
+
+  deleteLobby(id: string): void {
+    this.lobbyStore.removeLobby(id);
+  }
+
+  addPlayerToLobby(id: string, player: Player): void {
+    let lobby: Lobby | undefined = this.lobbyStore.getLobbyById(id);
+
+    if (!lobby) {
+      throw error("Lobby not found");
     }
 
-    lobbyStore.lobbies.set(newId, newLobby)
-    return newId
-}
+    lobby.players.push(player);
+  }
 
-function removeLobby(lobbyStore: LobbyStore, id: string) {
-    return lobbyStore.lobbies.delete(id);
-}
+  removePlayerFromLobby(id: string, player: Player): void {
+    let lobby = this.lobbyStore.getLobbyById(id);
 
-function listLobbies(lobbyStore: LobbyStore) {
-    const lobbies: Map<string, Lobby> = lobbyStore.lobbies;
-
-    for (const [key, value] of lobbies) {
-        const host = value.host.name;
-        console.log(`Lobby Id: ${key}, Host: ${host}`)
+    if (!lobby) {
+      throw error("Lobby not found");
     }
+
+    let players = lobby.players;
+    players.filter((p) => p !== player);
+
+    this.lobbyStore.updateLobby(lobby);
+  }
+
+  getAllLobbies(): Lobby[] {
+    return this.lobbyStore.getLobbies();
+  }
 }
-
-export { getLobby, createLobby, removeLobby, listLobbies, LobbyStore }
-
-
