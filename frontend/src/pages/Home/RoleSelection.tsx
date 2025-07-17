@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Group, Text } from "@mantine/core";
-import { socket } from "./Pages";
+import { socket } from "../../utils/socket";
 import { Player } from "../../models/player";
 
 interface RoleSelectionProps {

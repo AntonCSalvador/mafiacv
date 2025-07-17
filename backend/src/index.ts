@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
   console.log("New user connected:", socket.id);
 
   // Listen for creating a lobby
-  socket.on("create-lobby", () => {
+  socket.on("create-lobby", (name) => {
     const lobbyId = Math.random().toString(36).substring(2, 8); // Generate a random lobby ID
 
     socket.join(lobbyId);
