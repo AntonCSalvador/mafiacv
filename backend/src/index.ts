@@ -17,6 +17,7 @@ const io = new Server(server, {
   },
 });
 
+// Define globals
 const lobbyManager = new LobbyManager(lobbyStore);
 
 io.on("connection", (socket) => {
@@ -31,6 +32,7 @@ io.on("connection", (socket) => {
 
     const newLobby: Lobby = lobbyManager.createLobby(newPlayer);
 
+    // group socket by lobby id
     socket.join(newLobby.id);
     socket.emit("lobby:create", newLobby);
   });
@@ -46,15 +48,16 @@ io.on("connection", (socket) => {
 
     let players = lobbyStore.getLobbyById(lobbyId)?.players;
 
-    // set namespace
     socket.join(lobbyId);
     io.to(lobbyId).emit("players:update", players);
   });
 
-  // // Listen for starting the game
-  // socket.on("start-game", (lobbyId) => {
-  //   io.to(lobbyId).emit("game-started"); // Notify all players in the lobby that the game has started
-  // });
+  // TODO: Add logic for starting the game
+
+  // Listen for starting the game
+  socket.on("start-game", (lobbyId) => {
+    io.to(lobbyId).emit("game-started"); // Notify all players in the lobby that the game has started
+  });
 
   // const shuffleArray = <T>(array: T[]): T[] => {
   //   for (let i = array.length - 1; i > 0; i--) {

@@ -1,5 +1,11 @@
 import { error } from "console";
-import { Lobby, Player, ILobbyStore, ILobbyManager } from "./types";
+import {
+  Lobby,
+  Player,
+  ILobbyStore,
+  ILobbyManager,
+  GameConfiguration,
+} from "./types";
 import { LobbyStore } from "./lobbyStore";
 
 export class LobbyManager implements ILobbyManager {
